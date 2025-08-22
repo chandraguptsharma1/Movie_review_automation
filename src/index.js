@@ -467,25 +467,25 @@ app.post('/api/scripts', async (req, res) => {
 });
 
 
-// ---------- Daily auto generation (optional log only) ----------
-cron.schedule('0 9 * * *', async () => {
-    try {
-        const { items } = await fetchTrending('IN', 1, 'en')
-        const first = items?.[0]
-        if (!first) return
-        const json = await generateScript({ title: first.title, year: first.year, overview: first.overview })
-        console.log('Daily script (not saved to DB):', json.title)
-    } catch (e) {
-        console.error('Cron error', e.message)
-    }
-}, { timezone: 'Asia/Kolkata' })
+// // ---------- Daily auto generation (optional log only) ----------
+// cron.schedule('0 9 * * *', async () => {
+//     try {
+//         const { items } = await fetchTrending('IN', 1, 'en')
+//         const first = items?.[0]
+//         if (!first) return
+//         const json = await generateScript({ title: first.title, year: first.year, overview: first.overview })
+//         console.log('Daily script (not saved to DB):', json.title)
+//     } catch (e) {
+//         console.error('Cron error', e.message)
+//     }
+// }, { timezone: 'Asia/Kolkata' })
 
-// ---------- Start ----------
-const port = Number(process.env.PORT || 8080)
-app.listen(port, () => {
-    console.log(`API running on http://localhost:${port}`)
-    console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
-})
+// // ---------- Start ----------
+// const port = Number(process.env.PORT || 8080)
+// app.listen(port, () => {
+//     console.log(`API running on http://localhost:${port}`)
+//     console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
+// })
 
 
 // ---------- Hindi movies ----------
