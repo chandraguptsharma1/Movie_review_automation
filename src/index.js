@@ -19,6 +19,13 @@ const TMDB = axios.create({
     params: { api_key: process.env.TMDB_KEY }, // v3 key
 })
 
+// ---------- Start ----------
+const port = Number(process.env.PORT || 8080)
+app.listen(port, () => {
+    console.log(`API running on http://localhost:${port}`)
+    console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
+})
+
 
 // ---------- Style profile (customizable) ----------
 const DEFAULT_STYLE = {
@@ -316,9 +323,9 @@ Return ONLY JSON with exactly these keys:
 "title","oneLiner","summary","plotTheme","whatWorks","whatDoesnt","bestScenes","performances","writingDirection","actionTechnical","musicVfx","paceTone","familyGuide","whoShouldWatch","whoShouldSkip","ratings","verdict","narration".
 
 Rules:
-- "narration": 3 short paras (total ~${words} words). 
-  * Para 1: Seedha audience se baat karo, thoda story tease karo — “Scene aisa hai ki tumhe lagega wah kya premise hai!” 
-  * Para 2: Mast factor batao — kya dhamaka hai (acting, action, music, VFX, comedy, jo bhi movie ka spice ho). Energetic tone, thoda Hinglish slang. 
+- "narration": 3 short paras (total ~${words} words).
+  * Para 1: Seedha audience se baat karo, thoda story tease karo — “Scene aisa hai ki tumhe lagega wah kya premise hai!”
+  * Para 2: Mast factor batao — kya dhamaka hai (acting, action, music, VFX, comedy, jo bhi movie ka spice ho). Energetic tone, thoda Hinglish slang.
   * Para 3: Waaoo factor + verdict line, ekdum catchy. CTA style line do — "subscribe karna mat bhoolna" jaisa ekdum bindass.
 - Avoid boring critic tone. Zyada engaging aur hype build karne wala.
 - Keep spoilers very light, bas feel dikhana hai.
@@ -480,12 +487,7 @@ app.post('/api/scripts', async (req, res) => {
 //     }
 // }, { timezone: 'Asia/Kolkata' })
 
-// // ---------- Start ----------
-// const port = Number(process.env.PORT || 8080)
-// app.listen(port, () => {
-//     console.log(`API running on http://localhost:${port}`)
-//     console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
-// })
+
 
 
 // ---------- Hindi movies ----------
@@ -573,3 +575,23 @@ app.get('/api/movies/hindi/by-genre', async (req, res) => {
         res.status(500).json({ ok: false, error: e.message })
     }
 })
+
+
+// import express from "express";
+// import cors from "cors";
+// import reviewRoutes from "./routes/review.routes.js";
+// import movieRoutes from "./routes/movie.routes.js";
+
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
+
+// // Routes
+// app.use("/api/review", reviewRoutes);
+// app.use("/api", movieRoutes);
+
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//     console.log(`🚀 Server running on port ${PORT}`);
+// });
+
