@@ -305,27 +305,29 @@ async function generateReview({ title, year, overview, style }) {
     // optional knob: caller can set style.narrationWords, else default ~260 words
     const words = (style && Number(style.narrationWords)) || 260;
 
-    const prompt = `You are a Hindi-English (Hinglish) film critic. Give a spoiler-light, helpful review for "${title}${year ? ` (${year})` : ''}".
+    const prompt = `Tu ek mast movie reviewer hai jo Hinglish me masti, style aur thoda masala dal ke review deta hai.
+Movie: "${title}${year ? ` (${year})` : ''}"
 
 STYLE PROFILE
 ${styleText}
+
 
 Return ONLY JSON with exactly these keys:
 "title","oneLiner","summary","plotTheme","whatWorks","whatDoesnt","bestScenes","performances","writingDirection","actionTechnical","musicVfx","paceTone","familyGuide","whoShouldWatch","whoShouldSkip","ratings","verdict","narration".
 
 Rules:
-- "narration": 3 short paragraphs (~${words} words total, ±15%), clean Hinglish monologue for voice-over.
-  * Para 1: setup + core premise (kis pe hai), tone/genre without spoilers.
-  * Para 2: what works (performances, writing/direction, action/craft, music/VFX, pacing) with 2–3 specific, vivid hints.
-  * Para 3: balanced take + who will enjoy / who may not + a crisp verdict line.
-  * No headings/bullets/emojis; continuous prose; natural pauses; phone-friendly wording.
-- "plotTheme": 1–2 lines (genre + core idea).
-- "whatWorks": 4–6 bullets. "whatDoesnt": 2–4 bullets (polite).
-- "bestScenes": 3–5 spoiler-light highlights.
-- Brief paras for: performances, writingDirection, actionTechnical, musicVfx, paceTone.
-- FamilyGuide + whoShouldWatch/Skip bullets.
-- "ratings": 0–10 for overall, story, acting, direction, action, music, vfx.
-- Arrays MUST be JSON arrays. Do NOT join items into one string.
+- "narration": 3 short paras (total ~${words} words). 
+  * Para 1: Seedha audience se baat karo, thoda story tease karo — “Scene aisa hai ki tumhe lagega wah kya premise hai!” 
+  * Para 2: Mast factor batao — kya dhamaka hai (acting, action, music, VFX, comedy, jo bhi movie ka spice ho). Energetic tone, thoda Hinglish slang. 
+  * Para 3: Waaoo factor + verdict line, ekdum catchy. CTA style line do — "subscribe karna mat bhoolna" jaisa ekdum bindass.
+- Avoid boring critic tone. Zyada engaging aur hype build karne wala.
+- Keep spoilers very light, bas feel dikhana hai.
+- "whatWorks": 4–6 bullets (mast cheezein).
+- "whatDoesnt": 2–3 polite bullets.
+- "bestScenes": 3–5 teaser highlights (waoo moments).
+- "ratings": 0–10 numbers (overall, story, acting, direction, action, music, vfx).
+- Arrays must be JSON arrays. Pure JSON output, no prose.
+
 
 ${overview ? `Overview (for reference): ${overview}` : ''}`;
 
@@ -483,4 +485,91 @@ const port = Number(process.env.PORT || 8080)
 app.listen(port, () => {
     console.log(`API running on http://localhost:${port}`)
     console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
+})
+
+
+// ---------- Hindi movies ----------
+async function fetchHindiMovies({
+    page = 1, region = 'IN', sortBy = 'popularity.desc', year, includeAdult = false,
+}) {
+    const params = {
+        with_original_language: 'hi',   // only Hindi
+        page,
+        region,
+        sort_by: sortBy,
+        include_adult: includeAdult,
+    }
+    if (year) params.primary_release_year = year
+
+    const { data } = await TMDB.get('/discover/movie', { params })
+    const results = (data?.results || []).map(mapMovie)
+    return {
+        page: data?.page || page,
+        total_pages: data?.total_pages || 1,
+        total_results: data?.total_results || results.length,
+        items: results,
+    }
+}
+
+app.get('/api/movies/hindi', async (req, res) => {
+    try {
+        const { page, region, sortBy, year, includeAdult } = req.query || {}
+        const payload = await fetchHindiMovies({
+            page: Number(page || 1),
+            region: (region || 'IN').toString(),
+            sortBy: (sortBy || 'popularity.desc').toString(),
+            year: year ? Number(year) : undefined,
+            includeAdult: includeAdult === 'true',
+        })
+        res.json({ ok: true, ...payload })
+    } catch (e) {
+        console.error('/api/movies/hindi', e)
+        res.status(500).json({ ok: false, error: e.message })
+    }
+})
+
+
+// ---------- Hindi movies by genre ----------
+async function fetchHindiByGenre({
+    genreId, page = 1, region = 'IN', sortBy = 'popularity.desc', year, includeAdult = false,
+}) {
+    const params = {
+        with_original_language: 'hi',
+        with_genres: genreId,   // Hindi + specific category
+        page,
+        region,
+        sort_by: sortBy,
+        include_adult: includeAdult,
+    }
+    if (year) params.primary_release_year = year
+
+    const { data } = await TMDB.get('/discover/movie', { params })
+    const results = (data?.results || []).map(mapMovie)
+    return {
+        page: data?.page || page,
+        total_pages: data?.total_pages || 1,
+        total_results: data?.total_results || results.length,
+        items: results,
+    }
+}
+
+app.get('/api/movies/hindi/by-genre', async (req, res) => {
+    try {
+        const { genreId, page, region, sortBy, year, includeAdult } = req.query || {}
+        if (!genreId) {
+            return res.status(400).json({ ok: false, error: 'genreId required' })
+        }
+        const payload = await fetchHindiByGenre({
+            genreId: genreId.toString(),
+            page: Number(page || 1),
+            region: (region || 'IN').toString(),
+            sortBy: (sortBy || 'popularity.desc').toString(),
+            year: year ? Number(year) : undefined,
+            includeAdult: includeAdult === 'true',
+        })
+        res.json({ ok: true, ...payload })
+    } catch (e) {
+        console.error('/api/movies/hindi/by-genre', e)
+        res.status(500).json({ ok: false, error: e.message })
+    }
 })
