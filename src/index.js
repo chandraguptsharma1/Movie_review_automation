@@ -6,6 +6,12 @@ import axios from 'axios'
 import cron from 'node-cron'
 import { OpenAI } from 'openai'
 import { z } from 'zod'
+import dns from "dns";
+import axiosRetry from "axios-retry";
+
+// Force Node.js to prefer IPv4 over IPv6
+dns.setDefaultResultOrder("ipv4first");
+
 
 const app = express()
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -15,9 +21,19 @@ app.use(express.json({ limit: '2mb' }))
 
 // ---------- TMDB ----------
 const TMDB = axios.create({
+    timeout: 10000,
     baseURL: 'https://api.themoviedb.org/3',
     params: { api_key: process.env.TMDB_KEY }, // v3 key
 })
+
+// retry mechanism
+axiosRetry(TMDB, {
+    retries: 3, // 3 बार retry
+    retryDelay: axiosRetry.exponentialDelay, // 500ms, फिर 1s, फिर 2s
+    retryCondition: (error) => {
+        return error.code === 'ECONNABORTED' || error.response?.status >= 500;
+    }
+});
 
 // ---------- Start ----------
 const port = Number(process.env.PORT || 8080)
@@ -25,6 +41,8 @@ app.listen(port, () => {
     console.log(`API running on http://localhost:${port}`)
     console.log('Allowed origin:', process.env.ALLOWED_ORIGIN || '*')
 })
+
+
 
 
 // ---------- Style profile (customizable) ----------
@@ -352,6 +370,21 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
     const json = safeJsonParse(text);
     return ReviewSchema.parse({ ...json, title });
 }
+// async function getTrendingSlider(req, res) {
+//     try {
+//         const region = (req.query.region || "IN").toString();
+//         const lang = (req.query.lang || "en").toString();
+//         const limit = Number(req.query.limit || 10);
+
+//         const payload = await fetchTrending(region, 1, lang); // सिर्फ page 1
+//         const items = (payload.items || []).slice(0, limit);
+
+//         res.json({ ok: true, items });
+//     } catch (e) {
+//         console.error("getTrendingSlider error:", e);
+//         res.status(500).json({ ok: false, error: e.message });
+//     }
+// }
 
 
 
@@ -361,6 +394,10 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
 app.get('/api/health', (_req, res) => {
     res.json({ ok: true, time: new Date().toISOString() })
 })
+
+// ---------- Trending Slider (Top N only) ----------
+// app.get('/api/trending/slider', getTrendingSlider);
+
 
 // trending with page/lang/region
 app.get('/api/trending', async (req, res) => {
