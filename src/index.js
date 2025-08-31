@@ -8,9 +8,11 @@ import { OpenAI } from 'openai'
 import { z } from 'zod'
 import dns from "dns";
 import axiosRetry from "axios-retry";
+import https from "https";
+
 
 // Force Node.js to prefer IPv4 over IPv6
-dns.setDefaultResultOrder("ipv4first");
+const agent = new https.Agent({ family: 4 });
 
 
 const app = express()
@@ -24,15 +26,15 @@ const TMDB = axios.create({
     timeout: 10000,
     baseURL: 'https://api.themoviedb.org/3',
     params: { api_key: process.env.TMDB_KEY }, // v3 key
+    httpsAgent: agent,
 })
 
 // retry mechanism
 axiosRetry(TMDB, {
-    retries: 3, // 3 बार retry
-    retryDelay: axiosRetry.exponentialDelay, // 500ms, फिर 1s, फिर 2s
-    retryCondition: (error) => {
-        return error.code === 'ECONNABORTED' || error.response?.status >= 500;
-    }
+    retries: 3,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) =>
+        error.code === "ECONNABORTED" || error.code === "ETIMEDOUT" || error.response?.status >= 500,
 });
 
 // ---------- Start ----------
@@ -98,6 +100,7 @@ function mapMovie(m) {
 async function fetchTrending(region = 'IN', page = 1, lang = 'en') {
     const { data } = await TMDB.get('/trending/movie/day', {
         params: { region, page, language: lang },
+        httpsAgent: agent
     })
     return {
         page: data?.page || page,
@@ -322,7 +325,6 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
     return parsed;
 }
 
-
 // ---------- OpenAI: review generation ----------
 // ---------- OpenAI: review generation (longer narration) ----------
 async function generateReview({ title, year, overview, style }) {
@@ -370,21 +372,21 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
     const json = safeJsonParse(text);
     return ReviewSchema.parse({ ...json, title });
 }
-// async function getTrendingSlider(req, res) {
-//     try {
-//         const region = (req.query.region || "IN").toString();
-//         const lang = (req.query.lang || "en").toString();
-//         const limit = Number(req.query.limit || 10);
+async function getTrendingSlider(req, res) {
+    try {
+        const region = (req.query.region || "IN").toString();
+        const lang = (req.query.lang || "en").toString();
+        const limit = Number(req.query.limit || 10);
 
-//         const payload = await fetchTrending(region, 1, lang); // सिर्फ page 1
-//         const items = (payload.items || []).slice(0, limit);
+        const payload = await fetchTrending(region, 1, lang); // सिर्फ page 1
+        const items = (payload.items || []).slice(0, limit);
 
-//         res.json({ ok: true, items });
-//     } catch (e) {
-//         console.error("getTrendingSlider error:", e);
-//         res.status(500).json({ ok: false, error: e.message });
-//     }
-// }
+        res.json({ ok: true, items });
+    } catch (e) {
+        console.error("getTrendingSlider error:", e);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+}
 
 
 
@@ -396,9 +398,7 @@ app.get('/api/health', (_req, res) => {
 })
 
 // ---------- Trending Slider (Top N only) ----------
-// app.get('/api/trending/slider', getTrendingSlider);
-
-
+app.get('/api/trending/slider', getTrendingSlider);
 // trending with page/lang/region
 app.get('/api/trending', async (req, res) => {
     try {
