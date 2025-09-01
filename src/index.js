@@ -388,11 +388,43 @@ async function getTrendingSlider(req, res) {
     }
 }
 
+// ---------- Upcoming Movies ----------
+async function fetchUpcoming({ page = 1, region = 'IN', lang = 'en' }) {
+    const { data } = await TMDB.get('/movie/upcoming', {
+        params: { page, region, language: lang },
+    });
+    const results = (data?.results || []).map(mapMovie);
+    return {
+        page: data?.page || page,
+        total_pages: data?.total_pages || 1,
+        total_results: data?.total_results || results.length,
+        items: results,
+    };
+}
+
+
 
 
 
 
 // ---------- Routes ----------
+
+app.get('/api/movies/upcoming', async (req, res) => {
+    try {
+        const { page, region, lang } = req.query || {};
+        const payload = await fetchUpcoming({
+            page: Number(page || 1),
+            region: (region || 'IN').toString(),
+            lang: (lang || 'en').toString(),
+        });
+        res.json({ ok: true, ...payload });
+    } catch (e) {
+        console.error('/api/movies/upcoming', e);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+
 app.get('/api/health', (_req, res) => {
     res.json({ ok: true, time: new Date().toISOString() })
 })
