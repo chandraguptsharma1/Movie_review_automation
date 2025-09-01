@@ -409,6 +409,19 @@ async function fetchUpcoming({ page = 1, region = 'IN', lang = 'en' }) {
 
 // ---------- Routes ----------
 
+// /api/movie/:id
+app.get('/api/movie/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const lang = (req.query.lang || "en").toString();
+        const { data } = await TMDB.get(`/movie/${id}`, { params: { language: lang } });
+        res.json({ ok: true, item: data });
+    } catch (e) {
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+
 app.get('/api/movies/upcoming', async (req, res) => {
     try {
         const { page, region, lang } = req.query || {};
