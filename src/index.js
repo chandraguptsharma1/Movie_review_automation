@@ -332,31 +332,33 @@ async function generateReview({ title, year, overview, style }) {
     // optional knob: caller can set style.narrationWords, else default ~260 words
     const words = (style && Number(style.narrationWords)) || 260;
 
-    const prompt = `Tu ek mast movie reviewer hai jo Hinglish me masti, style aur thoda masala dal ke review deta hai.
+    const prompt = `Tu ek top-notch, full swag movie reviewer hai — audience ko feel dena teri duty hai. Tera style? Hinglish mein full on tadka, masti, satire, aur savage one-liners ke saath review. Bhai, boring critics jaise bilkul bhi nahi banna.
+
 Movie: "${title}${year ? ` (${year})` : ''}"
 
-STYLE PROFILE
+STYLE PROFILE:
 ${styleText}
 
+👉 Tere output ka format strictly JSON hona chahiye with **exactly these keys**:
+"title","oneLiner","summary","plotTheme","whatWorks","whatDoesnt","bestScenes","performances","writingDirection","actionTechnical","musicVfx","paceTone","familyGuide","whoShouldWatch","whoShouldSkip","ratings","verdict","narration"
 
-Return ONLY JSON with exactly these keys:
-"title","oneLiner","summary","plotTheme","whatWorks","whatDoesnt","bestScenes","performances","writingDirection","actionTechnical","musicVfx","paceTone","familyGuide","whoShouldWatch","whoShouldSkip","ratings","verdict","narration".
+🎤 narration:
+- 3 short paras (total ~${words} words).
+  1. **Audience se seedha connection banao** — ek aisi line jo banda sune aur bole “Bro, trailer dekh ke hi maza aa gaya!” (No spoilers, sirf feel)
+  2. **Highlight the dhamaka** — acting, direction, music, VFX, ya koi killer element jo logon ko bole "Yeh toh dekhna hi padega!" Thoda Hinglish + desi swag daalo.
+  3. **Waaoo factor + Savage Verdict** — Bindass judgement do, like “Agar yeh movie miss kar di, toh FOMO ho jayega bro!” CTA style ending: “Aise aur reviews chahiye toh channel subscribe karna mat bhoolna!”
 
-Rules:
-- "narration": 3 short paras (total ~${words} words).
-  * Para 1: Seedha audience se baat karo, thoda story tease karo — “Scene aisa hai ki tumhe lagega wah kya premise hai!”
-  * Para 2: Mast factor batao — kya dhamaka hai (acting, action, music, VFX, comedy, jo bhi movie ka spice ho). Energetic tone, thoda Hinglish slang.
-  * Para 3: Waaoo factor + verdict line, ekdum catchy. CTA style line do — "subscribe karna mat bhoolna" jaisa ekdum bindass.
-- Avoid boring critic tone. Zyada engaging aur hype build karne wala.
-- Keep spoilers very light, bas feel dikhana hai.
-- "whatWorks": 4–6 bullets (mast cheezein).
-- "whatDoesnt": 2–3 polite bullets.
-- "bestScenes": 3–5 teaser highlights (waoo moments).
-- "ratings": 0–10 numbers (overall, story, acting, direction, action, music, vfx).
-- Arrays must be JSON arrays. Pure JSON output, no prose.
+🎯 Points to follow:
+- Spoilers mat dena, bas tease kar.
+- "whatWorks": 4–6 points max — full energy.
+- "whatDoesnt": 2–3 polite nudge-type.
+- "bestScenes": 3–5 waaoo moments.
+- "ratings": out of 10: overall, story, acting, direction, action, music, vfx
+- Saare lists proper JSON arrays mein ho.
+- Output = **PURE JSON**. Koi explanation, prose, ya markdown nahi.
 
+${overview ? `Reference overview: ${overview}` : ''}`;
 
-${overview ? `Overview (for reference): ${overview}` : ''}`;
 
     const resp = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
