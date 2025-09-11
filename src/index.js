@@ -345,14 +345,17 @@ ${styleText}
 
 🎤 narration:
 - 5–6 paras (total ~${words} words).
-- Style: Desi Hindi, bindass bol-chal wali bhasha, local slang, no English words.
+- Style: Desi Hindi, bol-chaal wali bhasha, full masti, koi English nahi.
 - Flow:
-  1. Shuruat: Seedha dosti wala hook — “Arre bhai, kya dhamaka tha! Picture shuru hote hi hall mein seetiyaan baj gayi.”
-  2. Kahani aur theme ka mazedaar jhalak — bina spoiler, bas itna ki banda samajh jaaye kaisi feel hai.
-  3. Acting, music, fight, direction, comedy, emotion — jo bhi mast cheezein hain, unhe highlight karo full josh ke saath.
-  4. Thoda chutkule aur hasi-mazaak mein nuks nikalo — jaise “Arre bhai, beech ka ek scene toh aisa laga jaise shaadi mein boring speech sun rahe ho.”
-  5. Best scenes ka mazedaar zikr — jahan audience taali aur seeti maarne lage.
-  6. Ek dum savage verdict aur dhamakedar line — “Bhai, yeh movie dekhne ke baad lagta hai paisa double vasool ho gaya! Agar miss kiya toh life bhar ka pachtaava hoga.” Aur ending ek thoda CTA style — “Review pasand aaya toh agli movie ka bhi intezaar karna bhoolna mat!”
+  1. Seedha shuru karo story se: “Film ki kahani ek … ke aas paas ghoomti hai.”  
+     Bas starting ke 2–3 incidents batao — setting, hero ka entry angle, ya kya challenge shuru hota hai.  
+     Ending ya major spoiler mat dena, bas bolo: “Aur aage kya hota hai, wo dekhne ke liye aapko movie dekhni padegi.”  
+  2. Phir discuss karo ki film ne apni koshish mein kitna rang jamaaya — story engaging hai ya nahi.  
+  3. Acting, music, action, direction, comedy, emotion — full josh ke saath highlight karo.  
+  4. Thoda hasi-mazaak mein halka nuks nikalo.  
+  5. Best scenes ke 3–4 waao moments ginao.  
+  6. Verdict: “Bhai, yeh movie dekh ke lagta hai paisa vasool ho gaya.”  
+     Aur fixed CTA: “Agar apko meri video pasand aati hai to like aur subscribe jarur kare.”  
 
 🎯 Points to follow:
 - Spoilers mat dena, bas tease kar.
