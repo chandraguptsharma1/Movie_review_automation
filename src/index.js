@@ -330,7 +330,7 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
 async function generateReview({ title, year, overview, style }) {
     const styleText = styleToText(mergeStyle(style));
     // optional knob: caller can set style.narrationWords, else default ~260 words
-    const words = (style && Number(style.narrationWords)) || 900;
+    const words = (style && Number(style.narrationWords)) || 500;
 
 
     const prompt = `Tu ek top-notch, full swag movie reviewer hai — audience ko feel dena teri duty hai. Tera style? Hinglish mein full on tadka, masti, satire, aur savage one-liners ke saath review. Bhai, boring critics jaise bilkul bhi nahi banna.
