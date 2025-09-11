@@ -330,7 +330,8 @@ ${overview ? `Overview (for reference): ${overview}` : ''}`;
 async function generateReview({ title, year, overview, style }) {
     const styleText = styleToText(mergeStyle(style));
     // optional knob: caller can set style.narrationWords, else default ~260 words
-    const words = (style && Number(style.narrationWords)) || 260;
+    const words = (style && Number(style.narrationWords)) || 900;
+
 
     const prompt = `Tu ek top-notch, full swag movie reviewer hai — audience ko feel dena teri duty hai. Tera style? Hinglish mein full on tadka, masti, satire, aur savage one-liners ke saath review. Bhai, boring critics jaise bilkul bhi nahi banna.
 
@@ -343,10 +344,15 @@ ${styleText}
 "title","oneLiner","summary","plotTheme","whatWorks","whatDoesnt","bestScenes","performances","writingDirection","actionTechnical","musicVfx","paceTone","familyGuide","whoShouldWatch","whoShouldSkip","ratings","verdict","narration"
 
 🎤 narration:
-- 3 short paras (total ~${words} words).
-  1. **Audience se seedha connection banao** — ek aisi line jo banda sune aur bole “Bro, trailer dekh ke hi maza aa gaya!” (No spoilers, sirf feel)
-  2. **Highlight the dhamaka** — acting, direction, music, VFX, ya koi killer element jo logon ko bole "Yeh toh dekhna hi padega!" Thoda Hinglish + desi swag daalo.
-  3. **Waaoo factor + Savage Verdict** — Bindass judgement do, like “Agar yeh movie miss kar di, toh FOMO ho jayega bro!” CTA style ending: “Aise aur reviews chahiye toh channel subscribe karna mat bhoolna!”
+- 5–6 paras (total ~${words} words).
+- Style: Desi Hindi, bindass bol-chal wali bhasha, local slang, no English words.
+- Flow:
+  1. Shuruat: Seedha dosti wala hook — “Arre bhai, kya dhamaka tha! Picture shuru hote hi hall mein seetiyaan baj gayi.”
+  2. Kahani aur theme ka mazedaar jhalak — bina spoiler, bas itna ki banda samajh jaaye kaisi feel hai.
+  3. Acting, music, fight, direction, comedy, emotion — jo bhi mast cheezein hain, unhe highlight karo full josh ke saath.
+  4. Thoda chutkule aur hasi-mazaak mein nuks nikalo — jaise “Arre bhai, beech ka ek scene toh aisa laga jaise shaadi mein boring speech sun rahe ho.”
+  5. Best scenes ka mazedaar zikr — jahan audience taali aur seeti maarne lage.
+  6. Ek dum savage verdict aur dhamakedar line — “Bhai, yeh movie dekhne ke baad lagta hai paisa double vasool ho gaya! Agar miss kiya toh life bhar ka pachtaava hoga.” Aur ending ek thoda CTA style — “Review pasand aaya toh agli movie ka bhi intezaar karna bhoolna mat!”
 
 🎯 Points to follow:
 - Spoilers mat dena, bas tease kar.
